@@ -114,6 +114,7 @@ INSTRUCCIONES ADICIONALES:
         "dias": dias,
         "relevancia_minima": relevancia_minima,
         "fuentes_recuperadas": len(fuentes),
+        "fuentes": fuentes,
         "tokens_entrada": uso.input_tokens if uso else None,
         "tokens_salida": uso.output_tokens if uso else None,
         "tokens_totales": uso.total_tokens if uso else None,
@@ -145,6 +146,11 @@ INSTRUCCIONES ADICIONALES:
 - Tokens de salida: {resultado["tokens_salida"]}
 - Tokens totales: {resultado["tokens_totales"]}
 
+## Fuentes utilizadas
+
+```json
+{json.dumps(resultado["fuentes"], ensure_ascii=False, indent=2)}
+
 ## Salida del agente
 
 {resultado["informe"]}
@@ -156,7 +162,7 @@ INSTRUCCIONES ADICIONALES:
     )
 
     resultado["archivo_corrida"] = str(archivo_corrida)
-    
+
     return resultado
 
 
