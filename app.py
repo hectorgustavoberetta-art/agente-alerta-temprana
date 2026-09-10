@@ -1,6 +1,7 @@
 import streamlit as st
 from pathlib import Path
-
+from io import BytesIO
+from docx import Document
 from agente.analizador import analizar_alerta
 
 
@@ -229,6 +230,124 @@ def construir_consulta(areas_seleccionadas):
             consultas.append(f"({consultas_por_area[area]})")
 
     return " OR ".join(consultas)
+
+
+def generar_word(resultado):
+    buffer = BytesIO()
+    documento = Document()
+
+    documento.add_heading(
+        "Sistema Agéntico de Alerta Temprana y Situación Operacional",
+        level=0,
+    )
+
+    documento.add_paragraph(
+        f'Fecha de ejecución: {resultado["fecha_ejecucion"]}'
+    )
+    documento.add_paragraph(
+        f'Modelo: {resultado["modelo"]}'
+    )
+    documento.add_paragraph(
+        f'Fuentes recuperadas: {resultado["fuentes_recuperadas"]}'
+    )
+
+    documento.add_heading("Informe de situación", level=1)
+
+    informe = resultado.get("informe", "")
+    lineas = informe.splitlines()
+
+    i = 0
+
+    while i < len(lineas):
+        linea = lineas[i].strip()
+
+        if not linea:
+            i += 1
+            continue
+
+        if linea.startswith("### "):
+            documento.add_heading(linea[4:], level=2)
+
+        elif linea.startswith("## "):
+            documento.add_heading(linea[3:], level=1)
+
+        elif linea.startswith("# "):
+            documento.add_heading(linea[2:], level=1)
+
+        elif linea.startswith("- "):
+            documento.add_paragraph(
+                linea[2:],
+                style="List Bullet",
+            )
+
+        elif linea.startswith("|"):
+            filas_tabla = []
+
+            while i < len(lineas) and lineas[i].strip().startswith("|"):
+                filas_tabla.append(lineas[i].strip())
+                i += 1
+
+            if len(filas_tabla) >= 3:
+                encabezados = [
+                    celda.strip()
+                    for celda in filas_tabla[0].strip("|").split("|")
+                ]
+
+                tabla = documento.add_table(
+                    rows=1,
+                    cols=len(encabezados),
+                )
+                tabla.style = "Table Grid"
+
+                for numero, encabezado in enumerate(encabezados):
+                    tabla.rows[0].cells[numero].text = encabezado
+
+                for fila in filas_tabla[2:]:
+                    celdas = [
+                        celda.strip()
+                        for celda in fila.strip("|").split("|")
+                    ]
+
+                    if len(celdas) != len(encabezados):
+                        continue
+
+                    nueva_fila = tabla.add_row().cells
+
+                    for numero, contenido in enumerate(celdas):
+                        nueva_fila[numero].text = contenido
+
+            continue
+
+        else:
+            documento.add_paragraph(linea)
+
+        i += 1
+
+    documento.add_heading("Fuentes consultadas", level=1)
+
+    for numero, fuente in enumerate(
+        resultado.get("fuentes", []),
+        start=1,
+    ):
+        titulo = fuente.get("titulo", "Fuente sin título")
+        nombre = fuente.get("fuente", "Fuente no informada")
+        fecha = fuente.get("fecha", "Fecha no informada")
+        url = fuente.get("url", "")
+
+        documento.add_paragraph(
+            f"{numero}. {titulo}\n"
+            f"Fuente: {nombre} · Fecha: {fecha}\n"
+            f"{url}"
+        )
+
+    documento.add_paragraph(
+        "Producto de apoyo al análisis sujeto a supervisión humana."
+    )
+
+    documento.save(buffer)
+    buffer.seek(0)
+
+    return buffer.getvalue()
 
 
 # ---------------------------------------------------------
@@ -696,11 +815,27 @@ if resultado:
         encoding="utf-8"
     )
 
+col_md, col_word = st.columns(2)
+
+with col_md:
     st.download_button(
-        label="Descargar informe",
+        label="📄 Descargar Markdown",
         data=contenido_descarga,
         file_name=nombre_archivo,
         mime="text/markdown",
+        use_container_width=True,
+    )
+
+with col_word:
+    contenido_word = generar_word(resultado)
+
+    nombre_word = Path(nombre_archivo).stem + ".docx"
+
+    st.download_button(
+        label="📝 Descargar Word",
+        data=contenido_word,
+        file_name=nombre_word,
+        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         use_container_width=True,
     )
 
