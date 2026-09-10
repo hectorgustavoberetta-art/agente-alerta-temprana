@@ -135,3 +135,18 @@ Esta prueba confirmó el funcionamiento completo del circuito:
 Usuario → Streamlit → búsqueda RSS → análisis mediante modelo → informe estructurado → registro de la corrida.
 
 La interfaz mantiene la supervisión humana: el sistema genera un producto de apoyo al análisis, pero el resultado debe ser revisado antes de su utilización o distribución.
+
+## Iteración 6 — Alineación entre contrato y ejecución
+
+Durante la revisión del sistema se detectó que `system_prompt.md` era cargado directamente por el código, pero `user_prompt.md` no era utilizado en la ejecución real.
+
+La solicitud del usuario se construía dentro de `agente/analizador.py`, lo que generaba una diferencia entre el contrato documentado y el contrato efectivamente ejecutado.
+
+Se modificó el agente para que:
+
+- cargue `prompts/system_prompt.md`;
+- cargue `prompts/user_prompt.md`;
+- reemplace dinámicamente las variables de período, áreas, relevancia y fuentes;
+- utilice ambos archivos como contrato efectivo de la ejecución.
+
+Este cambio mejora la trazabilidad y la reproducibilidad del sistema, ya que los prompts entregados en el repositorio son ahora los mismos que utiliza el agente.

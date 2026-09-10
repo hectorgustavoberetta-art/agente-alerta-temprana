@@ -13,10 +13,13 @@ MODELO = "gpt-5.6-sol"
 BASE_DIR = Path(__file__).resolve().parent.parent
 SYSTEM_PROMPT = BASE_DIR / "prompts" / "system_prompt.md"
 
+USER_PROMPT = BASE_DIR / "prompts" / "user_prompt.md"
 
 def cargar_system_prompt():
     return SYSTEM_PROMPT.read_text(encoding="utf-8")
 
+def cargar_user_prompt():
+    return USER_PROMPT.read_text(encoding="utf-8")
 
 def preparar_fuentes(articulos):
     fuentes = []
@@ -67,33 +70,26 @@ def analizar_alerta(
 
     system_prompt = cargar_system_prompt()
 
-    solicitud = f"""
-Generá un informe de alerta temprana utilizando exclusivamente
-las fuentes recuperadas por la herramienta.
+    user_prompt = cargar_user_prompt()
 
-Áreas seleccionadas:
-{", ".join(areas)}
+    solicitud = (
+        user_prompt
+        .replace("{{periodo}}", f"Últimos {dias} días")
+        .replace("{{areas}}", ", ".join(areas))
+        .replace("{{relevancia_minima}}", relevancia_minima)
+        .replace(
+            "{{fuentes_adicionales}}",
+            json.dumps(fuentes, ensure_ascii=False, indent=2),
+        )
+    )
 
-Período:
-Últimos {dias} días.
+    solicitud += """
 
-Nivel mínimo de relevancia:
-{relevancia_minima}
-
-FUENTES RECUPERADAS:
-
-{json.dumps(fuentes, ensure_ascii=False, indent=2)}
-
-INSTRUCCIONES ADICIONALES:
+## Instrucciones técnicas de ejecución
 
 - Descartá resultados comerciales, recreativos o irrelevantes.
-- No inventes información que no esté presente en las fuentes.
-- Conservá la URL de la fuente correspondiente a cada hecho.
-- Diferenciá hechos de inferencias.
-- Si una afirmación no puede sostenerse con la información disponible,
-  indicá la limitación.
-- Respondé siguiendo exactamente las secciones y campos definidos
-  en el system prompt.
+- Conservá la URL correspondiente a cada hecho utilizado.
+- Utilizá exclusivamente las fuentes recuperadas en esta ejecución.
 """
 
     cliente = OpenAI()
