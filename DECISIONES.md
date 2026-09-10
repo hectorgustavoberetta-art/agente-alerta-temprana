@@ -26,6 +26,22 @@ Durante las pruebas reales, la consulta alcanzó correctamente el servicio exter
 
 Se repitió la prueba y se obtuvo el mismo resultado.
 
+### Evidencia técnica de la prueba fallida
+
+La prueba se realizó durante la etapa inicial de integración de herramientas, ejecutando la consulta contra el servicio externo GDELT desde `herramientas/busqueda_gdelt.py`.
+
+La conexión con el servicio externo llegó a establecerse, pero la solicitud fue rechazada por el servidor con la respuesta:
+
+```text
+HTTP Error 429: Too Many Requests
+```
+
+La prueba se repitió y produjo nuevamente el mismo error HTTP 429, impidiendo obtener resultados utilizables para continuar el flujo de análisis.
+
+Esta falla ocurrió antes de implementar el mecanismo estandarizado de registro automático en la carpeta `corridas/`. Por ese motivo no existe una corrida independiente correspondiente a este intento inicial. La evidencia disponible se conserva en este registro de decisiones y en el archivo `herramientas/busqueda_gdelt.py`, que no fue eliminado del repositorio.
+
+El incidente motivó el cambio de herramienta documentado en la iteración siguiente, adoptándose RSS como mecanismo de recuperación de información pública.
+
 ### Decisión
 
 No se eliminó la herramienta ni se ocultó la falla. Se decidió conservarla como evidencia de la primera iteración y buscar una alternativa que permitiera continuar el desarrollo con mayor disponibilidad.
