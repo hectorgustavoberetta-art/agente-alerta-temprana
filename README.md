@@ -3,6 +3,16 @@
 Trabajo Final — Programación de y con Agentes de IA  
 MBA UCEMA · 2026 2T
 
+## Aplicación pública
+
+El sistema se encuentra desplegado en Streamlit Community Cloud y puede ejecutarse directamente desde:
+
+**[Abrir Sistema Agéntico de Alerta Temprana](https://agente-alerta-temprana.streamlit.app)**
+
+La aplicación permite seleccionar las áreas de interés, el período de análisis, el nivel mínimo de relevancia y la cantidad máxima de fuentes. Cada ejecución recupera información pública reciente, realiza el análisis mediante el agente y presenta los resultados en una interfaz estructurada.
+
+> El resultado constituye un producto de apoyo al análisis y requiere revisión humana antes de su utilización o distribución.
+
 ## Descripción
 
 Este proyecto implementa un sistema agéntico para recopilar, filtrar, clasificar y sintetizar información pública reciente relacionada con tecnologías y acontecimientos de interés para la situación operacional.
