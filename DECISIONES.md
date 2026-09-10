@@ -64,3 +64,40 @@ El sistema dispone de:
 - una fuente real de datos sobre la cual construir el análisis agéntico.
 
 El siguiente objetivo es conectar la herramienta RSS con el modelo para transformar los resultados de búsqueda en un producto de alerta temprana estructurado.
+## Iteración 4 — Integración del agente con el modelo
+
+Se desarrolló `agente/analizador.py` para integrar la búsqueda RSS con el modelo de IA.
+
+En la primera prueba se intentó ejecutar:
+
+`python agente/analizador.py`
+
+La ejecución falló con:
+
+`ModuleNotFoundError: No module named 'herramientas'`
+
+El problema se produjo porque el archivo se ejecutaba directamente y Python no reconocía correctamente los módulos ubicados en carpetas hermanas.
+
+### Decisión
+
+Se incorporaron archivos `__init__.py` en `agente/` y `herramientas/` y se modificó la forma de ejecución a:
+
+`python -m agente.analizador`
+
+La segunda prueba funcionó correctamente.
+
+El sistema recuperó 10 fuentes reales mediante RSS, las envió al modelo y produjo un informe completo con resumen ejecutivo, alertas prioritarias, hechos estructurados, tendencias y limitaciones.
+
+El agente descartó resultados comerciales o recreativos y explicitó cuándo la evidencia disponible no permitía confirmar determinadas afirmaciones.
+
+La ejecución utilizó el modelo `gpt-5.6-sol` y registró:
+
+- Tokens de entrada: 3336
+- Tokens de salida: 5254
+- Tokens totales: 8590
+
+### Nueva necesidad detectada
+
+Aunque la ejecución funcionó, el resultado solamente se mostró en la terminal y no quedó preservado automáticamente como una corrida reproducible.
+
+La siguiente iteración incorporará el guardado automático de cada ejecución en la carpeta `corridas/`, incluyendo fecha, parámetros de entrada, modelo, fuentes utilizadas, salida completa y consumo de tokens.
