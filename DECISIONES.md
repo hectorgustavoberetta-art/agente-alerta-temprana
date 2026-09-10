@@ -150,3 +150,30 @@ Se modificó el agente para que:
 - utilice ambos archivos como contrato efectivo de la ejecución.
 
 Este cambio mejora la trazabilidad y la reproducibilidad del sistema, ya que los prompts entregados en el repositorio son ahora los mismos que utiliza el agente.
+
+## Iteración 7 — Selección del modelo mínimo suficiente
+
+Las primeras ejecuciones del sistema se realizaron con `gpt-5.6-sol` para priorizar la calidad durante el desarrollo inicial.
+
+Posteriormente se realizó una prueba comparativa con `gpt-5.6-luna`, utilizando un caso real de logística militar autónoma y 10 fuentes recuperadas mediante RSS.
+
+La Corrida 05 con Luna utilizó:
+
+- Tokens de entrada: 3.873
+- Tokens de salida: 3.180
+- Tokens totales: 7.053
+
+La salida mantuvo los elementos requeridos por el contrato: resumen ejecutivo, alertas prioritarias, informe estructurado, tendencias y limitaciones.
+
+También conservó comportamientos considerados críticos para el sistema:
+
+- filtró resultados predominantemente comerciales o poco pertinentes;
+- diferenció hechos de inferencias;
+- mantuvo trazabilidad con las fuentes;
+- reconoció que solamente disponía de títulos y metadatos;
+- evitó presentar como confirmados datos que requerían verificación;
+- mantuvo la exigencia de revisión humana.
+
+Por este motivo se decidió adoptar `gpt-5.6-luna` como modelo predeterminado. La decisión responde al principio de utilizar el modelo de menor costo que demostró calidad suficiente para la tarea, en lugar de mantener un modelo de mayor capacidad sin una necesidad comprobada.
+
+La Corrida 05 se conserva como evidencia de esta decisión.

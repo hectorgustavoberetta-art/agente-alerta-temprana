@@ -8,7 +8,7 @@ from openai import OpenAI
 from herramientas.busqueda_rss import buscar_noticias_rss
 
 
-MODELO = "gpt-5.6-sol"
+MODELO = "gpt-5.6-luna"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SYSTEM_PROMPT = BASE_DIR / "prompts" / "system_prompt.md"
@@ -44,6 +44,7 @@ def analizar_alerta(
     dias=7,
     relevancia_minima="Media",
     max_resultados=10,
+    modelo=MODELO,
 ):
     """
     Busca información real mediante RSS y solicita al modelo
@@ -95,7 +96,7 @@ def analizar_alerta(
     cliente = OpenAI()
 
     respuesta = cliente.responses.create(
-        model=MODELO,
+    model=modelo,
         instructions=system_prompt,
         input=solicitud,
     )
