@@ -72,6 +72,52 @@ st.markdown(
         margin-bottom: 20px;
     }
 
+    .result-section {
+    background: white;
+    padding: 22px 24px;
+    border-radius: 12px;
+    border: 1px solid #e4e7eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    margin-bottom: 18px;
+}
+
+.result-section h3 {
+    color: #7A1730;
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 22px;
+}
+
+.alert-card {
+    background: #fff8f8;
+    border-left: 5px solid #7A1730;
+    padding: 16px 18px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.trend-card {
+    background: #f7f8fa;
+    border-left: 5px solid #6b7280;
+    padding: 16px 18px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.limit-card {
+    background: #fff9e8;
+    border-left: 5px solid #d6a520;
+    padding: 16px 18px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.result-meta {
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
     .footer {
         text-align: center;
         color: #6b7280;
@@ -227,9 +273,16 @@ with col2:
     )
 
 with col3:
+
+    texto_relevancia = {
+        "Alta": "Nivel alto",
+        "Media": "Nivel medio",
+        "Baja": "Nivel bajo",
+    }.get(relevancia, str(relevancia))
+
     st.metric(
         "Relevancia mínima",
-        str(relevancia),
+        texto_relevancia,
     )
 
 
@@ -341,11 +394,215 @@ if resultado:
 
     st.markdown("---")
 
-    st.markdown(
-        resultado["informe"]
-    )
+    informe = resultado["informe"]
 
+    secciones = {
+        "Resumen ejecutivo": "",
+        "Alertas prioritarias": "",
+        "Informe estructurado": "",
+        "Tendencias": "",
+        "Limitaciones": "",
+    }
 
+    seccion_actual = None
+
+    for linea in informe.splitlines():
+
+        linea_limpia = linea.strip()
+
+        if linea_limpia.startswith("## ") or linea_limpia.startswith("### "):
+
+            titulo = linea_limpia.lstrip("#").strip()
+
+            if titulo in secciones:
+                seccion_actual = titulo
+                continue
+
+        if seccion_actual:
+            secciones[seccion_actual] += linea + "\n"
+
+    # -----------------------------------------------------
+    # RESUMEN EJECUTIVO
+    # -----------------------------------------------------
+
+    if secciones["Resumen ejecutivo"].strip():
+
+        st.markdown("### Resumen ejecutivo")
+
+        with st.container(border=True):
+            st.markdown(
+                secciones["Resumen ejecutivo"].strip()
+            )
+
+    # -----------------------------------------------------
+    # ALERTAS PRIORITARIAS
+    # -----------------------------------------------------
+
+    if secciones["Alertas prioritarias"].strip():
+
+        st.markdown("### Alertas prioritarias")
+
+        with st.container(border=True):
+            st.markdown(
+                secciones["Alertas prioritarias"].strip()
+            )
+    # -----------------------------------------------------
+    # INFORME ESTRUCTURADO
+    # -----------------------------------------------------
+
+    if secciones["Informe estructurado"].strip():
+
+        st.markdown("### Informe estructurado")
+
+        contenido_tabla = secciones["Informe estructurado"].strip()
+
+        lineas_tabla = [
+            linea.strip()
+            for linea in contenido_tabla.splitlines()
+            if linea.strip().startswith("|")
+        ]
+
+        # Si la tabla tiene el formato esperado,
+        # cada hecho se muestra como una ficha desplegable.
+        if len(lineas_tabla) >= 3:
+
+            encabezados = [
+                celda.strip()
+                for celda in lineas_tabla[0].strip("|").split("|")
+            ]
+
+            filas = lineas_tabla[2:]
+
+            for numero, fila in enumerate(filas, start=1):
+
+                celdas = [
+                    celda.strip()
+                    for celda in fila.strip("|").split("|")
+                ]
+
+                if len(celdas) != len(encabezados):
+                    continue
+
+                datos = dict(zip(encabezados, celdas))
+
+                area = datos.get("Área", "Sin área")
+                hecho = datos.get("Hecho", "Hecho sin descripción")
+                relevancia_hecho = datos.get("Relevancia", "Sin clasificar")
+
+                normalizar_relevancia = {
+                    "alta": "Alta",
+                    "alto": "Alta",
+                    "media": "Media",
+                    "medio": "Media",
+                    "medios": "Media",
+                    "baja": "Baja",
+                    "bajo": "Baja",
+                }
+
+                relevancia_hecho = normalizar_relevancia.get(
+                    relevancia_hecho.strip().lower(),
+                    relevancia_hecho
+                )
+
+                icono_relevancia = {
+                    "Alta": "🔴",
+                    "Media": "🟠",
+                    "Baja": "🟢",
+                }.get(relevancia_hecho, "⚪")
+
+                titulo_hecho = hecho
+
+                if len(titulo_hecho) > 115:
+                    titulo_hecho = titulo_hecho[:112] + "..."
+
+                with st.expander(
+                    f"{icono_relevancia} {numero}. {area} · "
+                    f"{relevancia_hecho} · {titulo_hecho}"
+                ):
+
+                    c1, c2, c3, c4 = st.columns(4)
+
+                    with c1:
+                        st.caption("PAÍS / ACTOR")
+                        st.markdown(
+                            datos.get("País/Actor", "No informado")
+                        )
+
+                    with c2:
+                        st.caption("FECHA")
+                        st.markdown(
+                            datos.get("Fecha", "No informada")
+                        )
+
+                    with c3:
+                        st.caption("RELEVANCIA")
+                        st.markdown(
+                            f"**{icono_relevancia} {relevancia_hecho}**"
+                        )
+
+                    with c4:
+                        st.caption("FUENTE")
+                        st.markdown(
+                            datos.get("Fuente", "No informada")
+                        )
+
+                    st.divider()
+
+                    st.markdown("**Hecho**")
+                    st.markdown(hecho)
+
+                    st.markdown("**Estado de la información**")
+                    st.markdown(
+                        datos.get("Estado", "No informado")
+                    )
+
+                    st.markdown("**Tendencia**")
+                    st.markdown(
+                        datos.get("Tendencia", "No informada")
+                    )
+
+                    st.markdown("**Implicancia**")
+                    st.markdown(
+                        datos.get("Implicancia", "No informada")
+                    )
+
+                    st.markdown("**Seguimiento recomendado**")
+                    st.markdown(
+                        datos.get("Seguimiento", "No informado")
+                    )
+
+        else:
+
+            # Respaldo: si el formato cambia,
+            # se conserva la salida original.
+            st.markdown(contenido_tabla)
+
+    # -----------------------------------------------------
+    # TENDENCIAS Y LIMITACIONES
+    # -----------------------------------------------------
+
+    col_tendencias, col_limitaciones = st.columns(2)
+
+    with col_tendencias:
+
+        if secciones["Tendencias"].strip():
+
+            st.markdown("### Tendencias")
+
+            with st.container(border=True):
+                st.markdown(
+                    secciones["Tendencias"].strip()
+                )
+
+    with col_limitaciones:
+
+        if secciones["Limitaciones"].strip():
+
+            st.markdown("### Limitaciones")
+
+            st.warning(
+                secciones["Limitaciones"].strip()
+            )
     # -----------------------------------------------------
     # DESCARGA
     # -----------------------------------------------------
