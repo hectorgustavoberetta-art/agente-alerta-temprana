@@ -101,3 +101,37 @@ La ejecución utilizó el modelo `gpt-5.6-sol` y registró:
 Aunque la ejecución funcionó, el resultado solamente se mostró en la terminal y no quedó preservado automáticamente como una corrida reproducible.
 
 La siguiente iteración incorporará el guardado automático de cada ejecución en la carpeta `corridas/`, incluyendo fecha, parámetros de entrada, modelo, fuentes utilizadas, salida completa y consumo de tokens.
+
+## Iteración 5 — Integración de interfaz Streamlit
+
+Se desarrolló una interfaz visual en Streamlit para permitir la ejecución del sistema sin necesidad de utilizar directamente la terminal.
+
+La interfaz permite seleccionar:
+
+- áreas de interés;
+- período de análisis;
+- nivel mínimo de relevancia;
+- cantidad máxima de fuentes.
+
+La aplicación se conecta con el módulo `agente/analizador.py`, que realiza la búsqueda de información mediante RSS, envía las fuentes recuperadas al modelo y genera el informe estructurado.
+
+### Primera prueba desde la interfaz
+
+Se realizó una ejecución real desde Streamlit con los siguientes parámetros:
+
+- Área: UAS / FPV / ISR
+- Período: últimos 7 días
+- Relevancia mínima: Media
+- Fuentes recuperadas: 10
+- Modelo: gpt-5.6-sol
+- Tokens de entrada: 3533
+- Tokens de salida: 2782
+- Tokens totales: 6315
+
+La ejecución finalizó correctamente y generó automáticamente el archivo `corridas/corrida_04.md`.
+
+Esta prueba confirmó el funcionamiento completo del circuito:
+
+Usuario → Streamlit → búsqueda RSS → análisis mediante modelo → informe estructurado → registro de la corrida.
+
+La interfaz mantiene la supervisión humana: el sistema genera un producto de apoyo al análisis, pero el resultado debe ser revisado antes de su utilización o distribución.
