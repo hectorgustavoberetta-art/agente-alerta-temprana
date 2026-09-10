@@ -131,6 +131,9 @@ agente-alerta-temprana/
 ├── analisis_economico.md
 ├── gobierno_riesgos.md
 │
+├── assets/
+│   └── banner_alerta_temprana.png
+│
 ├── agente/
 │   ├── __init__.py
 │   └── analizador.py
@@ -150,4 +153,88 @@ agente-alerta-temprana/
     ├── corrida_02.md
     ├── corrida_03.md
     ├── corrida_04.md
-    └── corrida_05.md
+    ├── corrida_05.md
+    ├── corrida_06.md
+    ├── corrida_07.md
+    ├── corrida_08.md
+    ├── corrida_09.md
+    ├── corrida_10.md
+    └── corrida_11.md
+    
+## Instalación y reproducción
+
+El sistema puede reproducirse desde un entorno local o desde GitHub Codespaces.
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/hectorgustavoberetta-art/agente-alerta-temprana.git
+cd agente-alerta-temprana
+```
+
+### 2. Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configurar la API de OpenAI
+
+El sistema requiere una variable de entorno denominada `OPENAI_API_KEY`.
+
+La clave debe configurarse como secreto o variable de entorno y no debe incorporarse al código ni publicarse en el repositorio.
+
+En Linux, macOS o GitHub Codespaces:
+
+```bash
+export OPENAI_API_KEY="TU_CLAVE_DE_OPENAI"
+```
+
+En GitHub Codespaces puede configurarse mediante Codespaces Secrets.
+
+En Streamlit Community Cloud debe configurarse como secreto de la aplicación con el nombre `OPENAI_API_KEY`.
+
+### 4. Ejecutar por terminal
+
+```bash
+python -m agente.analizador
+```
+
+La ejecución recupera información pública, realiza el análisis y guarda automáticamente la evidencia en la carpeta `corridas/`.
+
+### 5. Ejecutar con Streamlit
+
+```bash
+streamlit run app.py
+```
+
+También puede utilizarse:
+
+```bash
+streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+```
+
+### 6. Evidencia y reproducibilidad
+
+La carpeta `corridas/` conserva las ejecuciones realizadas durante el desarrollo y validación del sistema.
+
+Cada corrida permite revisar, según la versión correspondiente:
+
+- fecha de ejecución;
+- parámetros utilizados;
+- modelo empleado;
+- fuentes recuperadas;
+- consumo de tokens;
+- resultado generado.
+
+Las salidas se preservan como evidencia del proceso. Si una ejecución presenta una URL malformada o una salida defectuosa, no se modifica retroactivamente; se conserva como parte de la trazabilidad.
+
+Para reconstruir el funcionamiento del proyecto, un tercero debe:
+
+1. clonar el repositorio;
+2. instalar `requirements.txt`;
+3. configurar su propia `OPENAI_API_KEY`;
+4. ejecutar `python -m agente.analizador` o `streamlit run app.py`;
+5. comparar la nueva ejecución con las evidencias almacenadas en `corridas/`.
+
+Los resultados pueden variar con el tiempo porque el sistema consulta información pública reciente y utiliza un modelo generativo. La arquitectura, los prompts, las herramientas y el procedimiento de ejecución permanecen documentados en el repositorio.
