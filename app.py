@@ -2,6 +2,8 @@ import streamlit as st
 from pathlib import Path
 from io import BytesIO
 from docx import Document
+from docx.enum.section import WD_ORIENT
+from docx.shared import Inches, Pt
 from agente.analizador import analizar_alerta
 
 
@@ -236,6 +238,23 @@ def generar_word(resultado):
     buffer = BytesIO()
     documento = Document()
 
+    seccion = documento.sections[0]
+    seccion.orientation = WD_ORIENT.LANDSCAPE
+
+    seccion.page_width, seccion.page_height = (
+        seccion.page_height,
+        seccion.page_width,
+    )
+
+    seccion.top_margin = Inches(0.5)
+    seccion.bottom_margin = Inches(0.5)
+    seccion.left_margin = Inches(0.5)
+    seccion.right_margin = Inches(0.5)
+
+    estilos = documento.styles
+    estilos["Normal"].font.name = "Arial"
+    estilos["Normal"].font.size = Pt(9)
+
     documento.add_heading(
         "Sistema Agéntico de Alerta Temprana y Situación Operacional",
         level=0,
@@ -293,16 +312,10 @@ def generar_word(resultado):
                     for celda in filas_tabla[0].strip("|").split("|")
                 ]
 
-                tabla = documento.add_table(
-                    rows=1,
-                    cols=len(encabezados),
-                )
-                tabla.style = "Table Grid"
-
-                for numero, encabezado in enumerate(encabezados):
-                    tabla.rows[0].cells[numero].text = encabezado
-
-                for fila in filas_tabla[2:]:
+                for numero_alerta, fila in enumerate(
+                    filas_tabla[2:],
+                    start=1,
+                ):
                     celdas = [
                         celda.strip()
                         for celda in fila.strip("|").split("|")
@@ -311,10 +324,42 @@ def generar_word(resultado):
                     if len(celdas) != len(encabezados):
                         continue
 
-                    nueva_fila = tabla.add_row().cells
+                    datos = dict(zip(encabezados, celdas))
 
-                    for numero, contenido in enumerate(celdas):
-                        nueva_fila[numero].text = contenido
+                    area = datos.get("Área", "Sin área")
+                    relevancia = datos.get(
+                        "Relevancia",
+                        "Sin clasificar",
+                    )
+
+                    documento.add_heading(
+                        f"Alerta {numero_alerta} — "
+                        f"{area} — {relevancia}",
+                        level=2,
+                    )
+
+                    campos = [
+                        ("Hecho", "Hecho"),
+                        ("País / Actor", "País/Actor"),
+                        ("Fecha", "Fecha"),
+                        ("Fuente", "Fuente"),
+                        ("Estado", "Estado"),
+                        ("Tendencia", "Tendencia"),
+                        ("Implicancia", "Implicancia"),
+                        ("Seguimiento", "Seguimiento"),
+                    ]
+
+                    for etiqueta, clave in campos:
+                        valor = datos.get(clave, "")
+
+                        if valor:
+                            parrafo = documento.add_paragraph()
+                            parrafo.add_run(
+                                f"{etiqueta}: "
+                            ).bold = True
+                            parrafo.add_run(valor)
+
+                    documento.add_paragraph("")
 
             continue
 
@@ -799,11 +844,12 @@ if resultado:
         else:
             st.info("No hay fuentes disponibles para mostrar.")
             
-        # -----------------------------------------------------
+    # -----------------------------------------------------
     # DESCARGA
     # -----------------------------------------------------
 
     st.markdown("---")
+    st.markdown("### Descargar informe")
 
     nombre_archivo = Path(
         resultado["archivo_corrida"]
@@ -815,31 +861,28 @@ if resultado:
         encoding="utf-8"
     )
 
-col_md, col_word = st.columns(2)
-
-with col_md:
-    st.download_button(
-        label="📄 Descargar Markdown",
-        data=contenido_descarga,
-        file_name=nombre_archivo,
-        mime="text/markdown",
-        use_container_width=True,
-    )
-
-with col_word:
     contenido_word = generar_word(resultado)
-
     nombre_word = Path(nombre_archivo).stem + ".docx"
 
-    st.download_button(
-        label="📝 Descargar Word",
-        data=contenido_word,
-        file_name=nombre_word,
-        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        use_container_width=True,
-    )
+    col_md, col_word = st.columns(2)
 
+    with col_md:
+        st.download_button(
+            label="📄 Descargar Markdown",
+            data=contenido_descarga,
+            file_name=nombre_archivo,
+            mime="text/markdown",
+            use_container_width=True,
+        )
 
+    with col_word:
+        st.download_button(
+            label="📝 Descargar Word",
+            data=contenido_word,
+            file_name=nombre_word,
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            use_container_width=True,
+        )
 # ---------------------------------------------------------
 # PIE
 # ---------------------------------------------------------
