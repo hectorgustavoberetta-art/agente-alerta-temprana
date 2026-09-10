@@ -98,3 +98,15 @@ Los valores anteriores representan únicamente el costo estimado de tokens del m
 No incluyen eventuales costos futuros de infraestructura, alojamiento, servicios externos o herramientas pagas.
 
 La fuente RSS utilizada actualmente es de acceso público y el sistema no incorpora en esta versión otros servicios pagos además de la API del modelo.
+
+## Fuente de precios
+
+Los precios utilizados en este análisis fueron consultados en la documentación oficial de OpenAI el **10 de septiembre de 2026**.
+
+- **GPT-5.6 Luna:** USD 0,20 por millón de tokens de entrada y USD 1,20 por millón de tokens de salida.
+  Fuente oficial: https://developers.openai.com/api/docs/models/gpt-5.6-luna
+
+- **GPT-5.6 Sol:** USD 4,00 por millón de tokens de entrada y USD 20,00 por millón de tokens de salida.
+  Fuente oficial: https://developers.openai.com/api/docs/models/gpt-5.6-sol
+
+Los precios corresponden a los valores publicados por OpenAI a la fecha de consulta y pueden modificarse posteriormente.
