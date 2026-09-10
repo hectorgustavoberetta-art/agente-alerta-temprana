@@ -109,8 +109,10 @@ El agente descartó resultados comerciales o recreativos y explicitó cuándo la
 La ejecución utilizó el modelo `gpt-5.6-sol` y registró:
 
 - Tokens de entrada: 3336
-- Tokens de salida: 5254
-- Tokens totales: 8590
+- Tokens de salida: 5319
+- Tokens totales: 8655
+
+Estos valores corresponden a la ejecución preservada en `corridas/corrida_01.md`.
 
 ### Nueva necesidad detectada
 

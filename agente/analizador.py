@@ -147,6 +147,7 @@ def analizar_alerta(
 
 ```json
 {json.dumps(resultado["fuentes"], ensure_ascii=False, indent=2)}
+```
 
 ## Salida del agente
 
