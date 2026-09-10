@@ -27,6 +27,11 @@ A partir de esta prueba se seleccionó `gpt-5.6-luna` como modelo final por mant
 - `corrida_07.md`
 - `corrida_08.md`
 - `corrida_09.md`
+- `corrida_10.md`
+- `corrida_11.md`
+- `corrida_12.md`
+- `corrida_13.md`
+- `corrida_14.md`
 
 Estas ejecuciones corresponden a la versión final del sistema, con:
 
@@ -64,7 +69,7 @@ Las primeras corridas se preservaron sin modificarlas retroactivamente, incluso 
 
 Esta decisión permite mostrar de manera transparente la evolución real del sistema.
 
-Para reconstruir y evaluar la versión final se recomienda utilizar principalmente las corridas `06`, `07`, `08` y `09`, junto con los archivos:
+Para reconstruir y evaluar la versión final se recomienda utilizar las corridas `06` a `14`, junto con los archivos:
 
 - `prompts/system_prompt.md`
 - `prompts/user_prompt.md`
